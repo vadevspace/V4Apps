@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VISN 4 HRIS — Application Directory</title>
+<style>
+  :root {
+    --bg: #0d151f;
+    --surface: #121b27;
+    --surface-2: #17222f;
+    --border: #22303f;
+    --border-light: #2d3d4f;
+    --text: #f2f2f3;
+    --text-dim: #93a1b0;
+    --text-faint: #5c6b7c;
+    --accent: #005ea2;
+    --accent-bright: #4f9fd8;
+    --accent-glow: rgba(0,94,162,0.4);
+    --gold: #cfa355;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* subtle grain texture */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- NAV ---------- */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 48px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,10,12,0.75);
+    backdrop-filter: blur(16px);
+  }
+
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+  }
+
+  .nav-mark {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 12px;
+    color: white;
+    letter-spacing: -0.5px;
+  }
+
+  .nav-brand span {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+  }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .nav-badge {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 12px;
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .pulse-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #3ecf8e;
+    box-shadow: 0 0 0 0 rgba(62,207,142,0.6);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(62,207,142,0.5); }
+    70% { box-shadow: 0 0 0 6px rgba(62,207,142,0); }
+    100% { box-shadow: 0 0 0 0 rgba(62,207,142,0); }
+  }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    position: relative;
+    padding: 110px 48px 90px 48px;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .hero-glow {
+    position: absolute;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 900px;
+    height: 500px;
+    background: radial-gradient(ellipse, var(--accent-glow), transparent 70%);
+    pointer-events: none;
+    filter: blur(20px);
+  }
+
+  .hero-grid-fade {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: linear-gradient(180deg, black, transparent 75%);
+    pointer-events: none;
+  }
+
+  .hero-inner {
+    position: relative;
+    z-index: 2;
+    max-width: 780px;
+    margin: 0 auto;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    border: 1px solid var(--border-light);
+    border-radius: 100px;
+    font-size: 12.5px;
+    color: var(--text-dim);
+    margin-bottom: 28px;
+    background: var(--surface);
+  }
+
+  .hero-eyebrow .accent-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+
+  .hero h1 {
+    font-size: clamp(38px, 6vw, 64px);
+    font-weight: 700;
+    letter-spacing: -2.2px;
+    line-height: 1.2;
+    padding-bottom: 6px;
+    margin-bottom: 22px;
+    background: linear-gradient(180deg, #ffffff 0%, #b8b8c4 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .hero p.sub {
+    font-size: 17px;
+    color: var(--text-dim);
+    line-height: 1.65;
+    max-width: 560px;
+    margin: 0 auto 44px auto;
+  }
+
+  .hero-metrics {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .hmetric {
+    flex: 1;
+    padding: 0 28px;
+    border-left: 1px solid var(--border);
+  }
+
+  .hmetric:first-child { border-left: none; }
+
+  .hmetric .num {
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    color: white;
+  }
+
+  .hmetric .lbl {
+    font-size: 12px;
+    color: var(--text-faint);
+    margin-top: 4px;
+  }
+
+  .text-metric {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.2px !important;
+    padding-top: 6px;
+  }
+
+  /* ---------- TOOLBAR ---------- */
+  .toolbar {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 48px 32px 48px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .search-box {
+    position: relative;
+    flex: 1;
+    min-width: 260px;
+    max-width: 420px;
+  }
+
+  .search-box input {
+    width: 100%;
+    padding: 12px 16px 12px 40px;
+    border-radius: 9px;
+    border: 1px solid var(--border-light);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 13.5px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .search-box input::placeholder { color: var(--text-faint); }
+
+  .search-box input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+
+  .search-box svg {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 15px;
+    height: 15px;
+    stroke: var(--text-faint);
+  }
+
+  .filter-row {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+  }
+
+  .filter-pill {
+    padding: 8px 15px;
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+    background: var(--surface);
+    color: var(--text-dim);
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .filter-pill:hover {
+    border-color: var(--text-faint);
+    color: var(--text);
+  }
+
+  .filter-pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  .results-count {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 48px 20px 48px;
+    font-size: 12.5px;
+    color: var(--text-faint);
+  }
+
+  /* ---------- GRID ---------- */
+  .grid {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 48px 100px 48px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 20px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+    opacity: 0;
+    animation: rise 0.5s ease forwards;
+    display: flex;
+    flex-direction: column;
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card:hover {
+    border-color: var(--border-light);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 0 1px var(--border-light);
+  }
+
+  .card-image {
+    width: 100%;
+    height: 180px;
+    background: var(--surface-2);
+    overflow: hidden;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+    filter: grayscale(0.15) brightness(0.92);
+    transition: filter 0.4s, transform 0.5s cubic-bezier(.2,.8,.2,1);
+  }
+
+  .card:hover .card-image img {
+    filter: grayscale(0) brightness(1);
+    transform: scale(1.045);
+  }
+
+  .card-image::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 50%, rgba(10,10,12,0.5));
+    opacity: 0.7;
+    transition: opacity 0.3s;
+  }
+
+  .card:hover .card-image::after {
+    opacity: 0.2;
+  }
+
+  .card-body {
+    padding: 22px 22px 20px 22px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .card-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  .tag-pill {
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 5px;
+    background: rgba(94,106,210,0.12);
+    color: var(--accent-bright);
+    letter-spacing: 0.2px;
+  }
+
+  .card-title {
+    font-size: 16.5px;
+    font-weight: 650;
+    letter-spacing: -0.3px;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 15px;
+    border-top: 1px solid var(--border);
+    font-size: 12.5px;
+  }
+
+  .dev-tag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-faint);
+  }
+
+  .dev-avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background: var(--surface-2);
+    border: 1px solid var(--border-light);
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+  }
+
+  .view-link {
+    color: var(--text-dim);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: color 0.2s;
+  }
+
+  .card:hover .view-link {
+    color: var(--accent-bright);
+  }
+
+  .view-link svg {
+    width: 12px; height: 12px;
+    transition: transform 0.25s;
+  }
+
+  .card:hover .view-link svg {
+    transform: translateX(3px);
+  }
+
+  .no-results {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 100px 20px;
+    color: var(--text-faint);
+  }
+
+  .no-results h3 {
+    color: var(--text);
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  /* ---------- MODAL ---------- */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(5,5,7,0.8);
+    backdrop-filter: blur(10px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 24px;
+  }
+
+  .overlay.show { display: flex; animation: fadeIn 0.2s ease; }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border-light);
+    border-radius: 18px;
+    max-width: 940px;
+    width: 100%;
+    max-height: 88vh;
+    overflow-y: auto;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+    animation: pop 0.25s cubic-bezier(.2,.9,.3,1.1);
+  }
+
+  @keyframes pop {
+    from { transform: scale(0.95) translateY(10px); opacity: 0; }
+    to { transform: scale(1) translateY(0); opacity: 1; }
+  }
+
+  .modal-header {
+    padding: 28px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    z-index: 2;
+  }
+
+  .modal-tags {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .modal-header h2 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+
+  .modal-dev-line {
+    font-size: 13px;
+    color: var(--text-faint);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .close-btn {
+    background: var(--surface-2);
+    border: 1px solid var(--border-light);
+    color: var(--text-dim);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .close-btn:hover {
+    background: var(--border-light);
+    color: white;
+  }
+
+  .modal-body {
+    padding: 30px 32px 38px 32px;
+  }
+
+  .modal-desc {
+    font-size: 15.5px;
+    line-height: 1.85;
+    color: var(--text-dim);
+    white-space: pre-line;
+    margin-bottom: 30px;
+    padding-bottom: 26px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .gallery-label {
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-faint);
+    margin-bottom: 15px;
+  }
+
+  .shot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(265px, 1fr));
+    gap: 14px;
+  }
+
+  .shot-item {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    cursor: zoom-in;
+    transition: transform 0.25s, border-color 0.25s;
+  }
+
+  .shot-item:hover {
+    transform: translateY(-3px);
+    border-color: var(--border-light);
+  }
+
+  .shot-item img {
+    width: 100%;
+    display: block;
+  }
+
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(2,2,3,0.95);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: 30px;
+  }
+
+  .lightbox.show { display: flex; animation: fadeIn 0.2s ease; }
+
+  .lightbox img {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 10px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: 28px;
+    right: 36px;
+    color: white;
+    background: var(--surface);
+    border: 1px solid var(--border-light);
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+    cursor: pointer;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lightbox-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+    background: var(--surface);
+    border: 1px solid var(--border-light);
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .lightbox-nav:hover {
+    background: var(--border-light);
+    border-color: var(--accent);
+  }
+
+  .lightbox-nav.prev { left: 24px; }
+  .lightbox-nav.next { right: 24px; }
+
+  .lightbox-counter {
+    position: absolute;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--text-dim);
+    background: var(--surface);
+    border: 1px solid var(--border-light);
+    padding: 7px 16px;
+    border-radius: 100px;
+    font-size: 12.5px;
+    font-weight: 500;
+  }
+
+  footer {
+    text-align: center;
+    padding: 26px;
+    color: var(--text-faint);
+    font-size: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 680px) {
+    nav, .hero, .toolbar, .grid, .results-count { padding-left: 20px; padding-right: 20px; }
+    .modal-header, .modal-body { padding-left: 20px; padding-right: 20px; }
+    .toolbar { flex-direction: column; align-items: stretch; }
+    .search-box { max-width: none; }
+    .hero-metrics { flex-wrap: wrap; gap: 20px; }
+    .hmetric { border-left: none; flex: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    <div class="nav-mark">V4</div>
+    <span>VISN 4 HRIS</span>
+  </div>
+  <div class="nav-right">
+    <div class="nav-badge">
+      <div class="pulse-dot"></div>
+      All systems operational
+    </div>
+    <span>U.S. Department of Veterans Affairs</span>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-grid-fade"></div>
+  <div class="hero-inner">
+    <div class="hero-eyebrow">
+      <span class="accent-dot"></span>
+      Internal Application Directory
+    </div>
+    <h1>VISN 4 App Catalog</h1>
+    <p class="sub">A centralized directory of internal HRIS applications built to streamline workforce management, leave programs, document routing, and performance tracking across VISN 4.</p>
+    <div class="hero-metrics" id="heroMetrics"></div>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="search-box">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+    <input type="text" id="searchInput" placeholder="Search applications...">
+  </div>
+  <div class="filter-row" id="filterRow"></div>
+</div>
+
+<div class="results-count" id="resultsCount"></div>
+
+<div class="grid" id="appGrid"></div>
+
+<footer>
+  VISN 4 HRIS Applications · Internal Use Only · Built for VA Employees
+</footer>
+
+<div class="overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-tags" id="modalTags"></div>
+        <h2 id="modalTitle"></h2>
+        <div class="modal-dev-line" id="modalDev"></div>
+      </div>
+      <button class="close-btn" id="closeModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-desc" id="modalDesc"></div>
+      <div class="gallery-label">Screenshots</div>
+      <div class="shot-grid" id="modalShots"></div>
+    </div>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightboxClose">✕</button>
+  <button class="lightbox-nav prev" id="lightboxPrev">‹</button>
+  <img id="lightboxImg" src="" alt="Screenshot">
+  <button class="lightbox-nav next" id="lightboxNext">›</button>
+  <div class="lightbox-counter" id="lightboxCounter"></div>
+</div>
+
+<script>
+const IMG_BASE = "images/";
+
+const apps = [
+  {
+    id: "aims",
+    name: "AIMS",
+    fullName: "Action Item Management System",
+    developer: "Chris Duenas",
+    description: "The Action Item Management System (AIMS) is a modern, centralized platform designed to streamline how organizations enter, track, and manage action items. By providing a consistent structure for creating tasks, assigning responsibilities, setting deadlines, and monitoring progress in real time, AIMS enhances clarity, coordination, and accountability across teams.\n\nAIMS empowers staff to:\n• Create and assign action items with clear owners, timelines, and expectations.\n• Monitor progress in real time using an intuitive dashboard and role-based views for Owners, Admins, and Members.\n• Leverage robust reporting to visualize activity, measure progress, and ensure follow-through on key initiatives.\n• Route actions appropriately across VISN, station, or service line levels, ensuring proper review and collaboration.\n• Receive automated notifications when actions are assigned, returned, or completed—keeping everyone aligned.",
+    tags: ["Task Management", "Reporting"],
+    files: ["aims1.png", "aims2.png", "aims3.png", "aims4.png", "aims5.png"]
+  },
+  {
+    id: "rmc",
+    name: "RMC",
+    fullName: "Resource Management Center",
+    developer: "Chris Duenas",
+    description: "The RMC App provides a modern, centralized platform for VISN 4 leaders, service lines, and HR staff to submit and track workforce management requests with clarity, transparency, and efficiency. Built on the Microsoft Cloud platform, the app replaces the legacy LEAF portal while maintaining all required internal procedures—now with a significantly improved user experience.\n\nSupports: New Position Requests, Vice Position Requests, Fee Basis Appointments, and FTEE Increase Requests.\n\nKey enhancements include Position Lookup Integration with HR Smart, Role-Based Access, Automated Routing through service chief, quad/pentad, finance, RMC/RMB, and medical center director, plus an Attachment Repository, Request History, Favorites, and Request Copying.",
+    tags: ["Workforce Management", "Routing"],
+    files: ["rmc1.png", "rmc2.png", "rmc3.png", "rmc4.png"]
+  },
+  {
+    id: "special-leave",
+    name: "Special Leave",
+    fullName: "Special Leave Program Portal",
+    developer: "Chris Duenas",
+    description: "The Special Leave App is your all-in-one gateway for navigating federal leave programs with clarity, consistency, and ease. Designed to support employees through life's planned and unexpected events, the app provides streamlined access to major leave flexibilities—including FMLA, Paid Parental Leave, Voluntary Leave Transfer Program (VLTP), Disabled Veteran Leave, Military Leave, and other specialized entitlements.\n\nKey program areas:\n• Family and Medical Leave Act (FMLA) — up to 12 workweeks, continuous or intermittent.\n• Paid Parental Leave (PPL) — up to 12 weeks following birth, adoption, or foster placement.\n• Voluntary Leave Transfer Program (VLTP) — donated leave for medical emergencies.\n• Disabled Veteran Leave (DVL) — up to 104 hours for eligible veterans.\n\nThrough intuitive workflows, role-based guidance, and submission pathways, the app centralizes policy information and supports timely, accurate leave requests.",
+    tags: ["Leave Management", "FMLA"],
+    files: ["leave1.png", "leave2.png", "leave3.png", "leave4.png"]
+  },
+  {
+    id: "docuflow",
+    name: "DocuFlow",
+    fullName: "Dynamic Document Routing",
+    developer: "Chris Duenas",
+    description: "DocuFlow is a flexible, dynamic document-routing application designed to streamline approvals, enhance collaboration, and adapt to the way your organization works. Unlike traditional routing tools with rigid, predetermined sequences, DocuFlow empowers users to create custom workflows that fit any process—simple or complex.\n\nUsers can quickly generate a routing request by entering key details (title, description, due date, attachments) and selecting approval groups or individuals. Its dynamic routing engine allows steps to be added, removed, or rearranged at any time. Reviewers can comment, approve, request changes, or return items to the originator, and a complete history log maintains transparency throughout the document lifecycle.\n\nRole-based experiences—Member, Admin, and Owner—adapt to different responsibilities while keeping the interface streamlined and customizable.",
+    tags: ["Document Routing", "Approvals"],
+    files: ["docuflow1.png", "docuflow2.png", "docuflow3.png", "docuflow4.png"]
+  },
+  {
+    id: "awards-planner",
+    name: "Awards Planner",
+    fullName: "Performance Awards Planner",
+    developer: "Chris Duenas",
+    description: "The Awards Planner is a centralized application designed to help supervisors and HR teams log, track, and manage employee end-of-year performance awards with accuracy and efficiency. Supporting VISN-wide workflows, the tool provides a structured, transparent process for forecasting ratings, reviewing award recommendations, and ensuring leadership approval at every stage.\n\nSupervisors use the Awards Planner to validate employees, input forecasted performance ratings, and submit award plans for higher-level review. The Executive Leadership Team (ELT) reviews and approves these forecasted ratings and award recommendations, ensuring alignment with organizational standards and budget considerations.\n\nIntegrates with enterprise systems such as ePerformance to surface discrepancies, provide consolidated metrics, and support data-driven award decisions.",
+    tags: ["Performance", "Awards"],
+    files: ["awardsplanner1.png", "awardsplanner2.png", "awardsplanner3.png"]
+  },
+  {
+    id: "v4hr-hub",
+    name: "VISN 4 HR Hub",
+    fullName: "VISN 4 Human Resources Hub",
+    developer: "Chris Duenas",
+    description: "The VISN 4 HR Hub is a centralized, easy-to-navigate workspace that gives employees, supervisors, and HR professionals direct access to all HR resources across VISN 4. The Hub organizes essential tools, systems, and information into clear sections, helping users quickly find what they need while supporting efficient HR operations.\n\nKey Features:\n• Centralized HR Access — yourHR Help Desk, Employee Self-Service, communications, org charts, work-life benefits, PIV scheduling, and more.\n• Streamlined Navigation — quick access to VA forms, HR Smart references, staffing tools, and policy libraries.\n• Comprehensive HR Resource Library — recruitment, onboarding, classification references, and operations content.\n• Integrated VISN 4 Organizational Support — directories, calendars, and coordination updates.\n• HRIS and Modernization Support — highlights VISN 4 HRIS applications and transformation initiatives.",
+    tags: ["Resource Hub", "Navigation"],
+    files: ["v4hr1.png", "v4hr2.png", "v4hr3.png", "v4hr4.png", "v4hr5.png"]
+  },
+  {
+    id: "bed-change",
+    name: "Bed Change",
+    fullName: "Clinical Restructuring & Bed Change",
+    developer: "Thomas Lieb",
+    description: "A streamlined application designed to simplify the submission, review, and management of Clinical Restructuring and Bed Change requests across VISN 4. The tool centralizes request workflows, reduces administrative burden, and ensures timely coordination between service lines and facility leadership. Users can easily track the status of submitted requests, upload supporting documentation, and maintain visibility throughout the approval process, improving operational efficiency and communication.",
+    tags: ["Clinical Ops"],
+    files: ["bedchange1.png"]
+  },
+  {
+    id: "duty-station",
+    name: "Duty Station Verification",
+    fullName: "Duty Station Verification Portal",
+    developer: "Dana O'Sullivan",
+    description: "A centralized, user-friendly portal that guides employees and supervisors through the full Duty Station Verification process. The application standardizes data collection, automates routing and notifications, and maintains a clear audit trail for HR and leadership review. By consolidating required information into one place, the tool enhances compliance, reduces errors, and ensures annual duty station validations are completed accurately and on time.",
+    tags: ["Verification"],
+    files: ["dutystation.png"]
+  },
+  {
+    id: "scheduling",
+    name: "Scheduling",
+    fullName: "New-Hire Testing Scheduler",
+    developer: "Dana O'Sullivan",
+    description: "An automated scheduling solution that manages new-hire onboarding requirements, including pre-employment physicals, drug tests, medical evaluations, and Employee Health appointments. The app ensures appointments are coordinated efficiently between HR, Occupational Health, and incoming employees. By reducing manual follow-up and eliminating scheduling inconsistencies, the tool supports a smoother onboarding experience and helps new employees meet all mandatory requirements quickly and accurately.",
+    tags: ["Onboarding", "Automation"],
+    files: ["scheduling1.png", "scheduling2.png"]
+  },
+  {
+    id: "payment-tracker",
+    name: "Payment Tracker",
+    fullName: "HR Payment Tracking Dashboard",
+    developer: "Thomas Lieb",
+    description: "A comprehensive dashboard that tracks, monitors, and organizes HR-related payments in real time. This application centralizes payment workflows—including incentives, reimbursements, and special pay actions—giving HR teams and leadership a clear view of payment status, processing timelines, and pending actions. With built-in alerts and transparent reporting, the Payment Tracker improves accountability, reduces delays, and ensures financial processes remain accurate and auditable.",
+    tags: ["Finance", "Dashboard"],
+    files: ["paymentTracker1.png"]
+  },
+  {
+    id: "hr-insights",
+    name: "HR Insights",
+    fullName: "HR Analytics & Reporting",
+    developer: "Shane Walker",
+    description: "A powerful analytics hub that connects users to a wide collection of HR dashboards and reports designed to support data-driven decision-making. The app allows users to search, filter, and organize dashboards across workforce management, recruitment, telework, compensation, and other HR domains. Features such as favoriting, detailed insights views, quick navigation, and integrated contact options make it easy to explore trends, monitor key metrics, and collaborate with dashboard owners. HR Insights provides a centralized, intuitive environment for turning HR data into meaningful action.",
+    tags: ["Analytics", "Dashboard"],
+    files: ["insights.png"]
+  }
+];
+
+apps.sort((a, b) => a.name.localeCompare(b.name));
+
+apps.forEach(app => {
+  app.coverUrl = IMG_BASE + app.files[0];
+  app.shotUrls = app.files.map(f => IMG_BASE + f);
+});
+
+function onImgError(img) {
+  img.onerror = null;
+  img.src = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(
+    `<svg xmlns='http://www.w3.org/2000/svg' width='400' height='220'>
+      <rect width='100%' height='100%' fill='#17171b'/>
+      <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='#58585f' font-family='Arial' font-size='13'>Image not found</text>
+    </svg>`
+  );
+}
+
+function initials(name) {
+  return name.split(" ").map(w => w[0]).join("").slice(0,2).toUpperCase();
+}
+
+function renderHeroMetrics() {
+  const devCount = new Set(apps.map(a => a.developer)).size;
+  const metrics = [
+    { num: apps.length, lbl: "Applications" },
+    { num: devCount, lbl: "Developers" },
+    { num: "", lbl: "Microsoft Power Platform / O365", isText: true }
+  ];
+  document.getElementById("heroMetrics").innerHTML = metrics.map(m =>
+    `<div class="hmetric"><div class="${m.isText ? 'num text-metric' : 'num'}">${m.isText ? m.lbl : m.num}</div>${m.isText ? '' : `<div class="lbl">${m.lbl}</div>`}</div>`
+  ).join("");
+}
+
+function renderFilters() {
+  const allTags = new Set();
+  apps.forEach(a => a.tags.forEach(t => allTags.add(t)));
+  const chips = ["All", ...Array.from(allTags).sort()];
+  const wrap = document.getElementById("filterRow");
+  wrap.innerHTML = chips.map((c,i) =>
+    `<div class="filter-pill ${i===0?'active':''}" data-tag="${c}">${c}</div>`
+  ).join("");
+  wrap.querySelectorAll(".filter-pill").forEach(chip => {
+    chip.addEventListener("click", () => {
+      wrap.querySelectorAll(".filter-pill").forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+      currentTag = chip.dataset.tag;
+      render();
+    });
+  });
+}
+
+let currentTag = "All";
+
+function render() {
+  const query = document.getElementById("searchInput").value.toLowerCase().trim();
+  const grid = document.getElementById("appGrid");
+  const filtered = apps.filter(a => {
+    const matchesTag = currentTag === "All" || a.tags.includes(currentTag);
+    const haystack = (a.name + " " + a.fullName + " " + a.description + " " + a.developer).toLowerCase();
+    const matchesQuery = !query || haystack.includes(query);
+    return matchesTag && matchesQuery;
+  });
+
+  document.getElementById("resultsCount").textContent =
+    `${filtered.length} of ${apps.length} applications`;
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="no-results"><h3>No applications found</h3><p>Try a different search term or filter.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map((app, i) => `
+    <div class="card" data-id="${app.id}" style="animation-delay:${i * 0.035}s">
+      <div class="card-image">
+        <img src="${app.coverUrl}" alt="${app.name} screenshot" loading="lazy" onerror="onImgError(this)">
+      </div>
+      <div class="card-body">
+        <div class="card-tags">
+          ${app.tags.map(t => `<span class="tag-pill">${t}</span>`).join("")}
+        </div>
+        <div class="card-title">${app.name}</div>
+        <div class="card-desc">${app.description.split("\n")[0]}</div>
+        <div class="card-footer">
+          <div class="dev-tag">
+            <div class="dev-avatar">${initials(app.developer)}</div>
+            <span>${app.developer}</span>
+          </div>
+          <div class="view-link">
+            View details
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join("");
+
+  grid.querySelectorAll(".card").forEach(card => {
+    card.addEventListener("click", () => openModal(card.dataset.id));
+  });
+}
+
+function openModal(id) {
+  const app = apps.find(a => a.id === id);
+  currentShots = app.shotUrls;
+  document.getElementById("modalTags").innerHTML = app.tags.map(t => `<span class="tag-pill">${t}</span>`).join("");
+  document.getElementById("modalTitle").textContent = `${app.name} — ${app.fullName}`;
+  document.getElementById("modalDev").innerHTML = `<div class="dev-avatar" style="width:20px;height:20px;font-size:8.5px;">${initials(app.developer)}</div> Developed by ${app.developer}`;
+  document.getElementById("modalDesc").textContent = app.description;
+  document.getElementById("modalShots").innerHTML = app.shotUrls.map((url, i) =>
+    `<div class="shot-item" data-index="${i}"><img src="${url}" alt="${app.name} screenshot" onerror="onImgError(this)"></div>`
+  ).join("");
+  document.getElementById("modalOverlay").classList.add("show");
+  document.querySelectorAll(".shot-item").forEach(item => {
+    item.addEventListener("click", () => {
+      openLightbox(parseInt(item.dataset.index));
+    });
+  });
+}
+
+let currentShots = [];
+let currentShotIndex = 0;
+
+function openLightbox(index) {
+  currentShotIndex = index;
+  updateLightbox();
+  document.getElementById("lightbox").classList.add("show");
+}
+
+function updateLightbox() {
+  document.getElementById("lightboxImg").src = currentShots[currentShotIndex];
+  document.getElementById("lightboxCounter").textContent = `${currentShotIndex + 1} / ${currentShots.length}`;
+  const multi = currentShots.length > 1;
+  document.getElementById("lightboxPrev").style.display = multi ? "flex" : "none";
+  document.getElementById("lightboxNext").style.display = multi ? "flex" : "none";
+  document.getElementById("lightboxCounter").style.display = multi ? "block" : "none";
+}
+
+function lightboxPrev() {
+  currentShotIndex = (currentShotIndex - 1 + currentShots.length) % currentShots.length;
+  updateLightbox();
+}
+
+function lightboxNext() {
+  currentShotIndex = (currentShotIndex + 1) % currentShots.length;
+  updateLightbox();
+}
+
+document.getElementById("lightboxPrev").addEventListener("click", (e) => {
+  e.stopPropagation();
+  lightboxPrev();
+});
+document.getElementById("lightboxNext").addEventListener("click", (e) => {
+  e.stopPropagation();
+  lightboxNext();
+});
+
+document.getElementById("closeModal").addEventListener("click", () => {
+  document.getElementById("modalOverlay").classList.remove("show");
+});
+document.getElementById("modalOverlay").addEventListener("click", (e) => {
+  if (e.target.id === "modalOverlay") e.target.classList.remove("show");
+});
+document.getElementById("lightboxClose").addEventListener("click", () => {
+  document.getElementById("lightbox").classList.remove("show");
+});
+document.getElementById("lightbox").addEventListener("click", (e) => {
+  if (e.target.id === "lightbox") e.target.classList.remove("show");
+});
+document.addEventListener("keydown", (e) => {
+  const lightboxOpen = document.getElementById("lightbox").classList.contains("show");
+  if (e.key === "Escape") {
+    document.getElementById("lightbox").classList.remove("show");
+    document.getElementById("modalOverlay").classList.remove("show");
+  }
+  if (lightboxOpen && e.key === "ArrowLeft") lightboxPrev();
+  if (lightboxOpen && e.key === "ArrowRight") lightboxNext();
+});
+document.getElementById("searchInput").addEventListener("input", render);
+
+renderHeroMetrics();
+renderFilters();
+render();
+</script>
+
+</body>
+</html>
