@@ -31,6 +31,50 @@
     position: relative;
   }
 
+  /* ---------- ACCESS GATE ---------- */
+  #accessGate {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: var(--bg);
+    align-items: center;
+    justify-content: center;
+    z-index: 999999;
+    padding: 24px;
+  }
+
+  .access-gate-box {
+    text-align: center;
+    max-width: 420px;
+  }
+
+  .access-gate-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px auto;
+  }
+
+  .access-gate-icon svg {
+    width: 26px;
+    height: 26px;
+    stroke: var(--text-dim);
+  }
+
+  #accessGate p {
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
   /* subtle grain texture */
   body::before {
     content: "";
@@ -52,7 +96,7 @@
     justify-content: space-between;
     padding: 18px 48px;
     border-bottom: 1px solid var(--border);
-    background: rgba(10,10,12,0.75);
+    background: rgba(13,21,31,0.75);
     backdrop-filter: blur(16px);
   }
 
@@ -404,7 +448,7 @@
     font-weight: 600;
     padding: 3px 9px;
     border-radius: 5px;
-    background: rgba(94,106,210,0.12);
+    background: rgba(0,94,162,0.14);
     color: var(--accent-bright);
     letter-spacing: 0.2px;
   }
@@ -727,6 +771,16 @@
 </head>
 <body>
 
+<div id="accessGate">
+  <div class="access-gate-box">
+    <div class="access-gate-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+    </div>
+    <p>Error loading contents, access restricted.</p>
+  </div>
+</div>
+
+<div class="page-content" id="pageContent" style="visibility:hidden;">
 <nav>
   <div class="nav-brand">
     <div class="nav-mark">V4</div>
@@ -797,16 +851,54 @@
   <div class="lightbox-counter" id="lightboxCounter"></div>
 </div>
 
-<script>
-const IMG_BASE = "https://dvagov.sharepoint.com/sites/V4hr/HRIS/SiteAssets/app-catalog/";
+</div><!-- /.page-content -->
 
-const apps = [
+<script>
+// ============================================================
+// ACCESS GATE — runs first, independent of everything below
+// ============================================================
+(function () {
+  var GATE_PROBE_URL = "https://dvagov.sharepoint.com/sites/V4hr/HRIS/SiteAssets/app-catalog/aims1.png";
+
+  var gateEl = document.getElementById("accessGate");
+  var contentEl = document.getElementById("pageContent");
+
+  function showContent() {
+    gateEl.style.display = "none";
+    contentEl.style.visibility = "visible";
+  }
+
+  function showDenied() {
+    contentEl.style.display = "none";
+    gateEl.style.display = "flex";
+  }
+
+  var probe = new Image();
+  probe.onload = showContent;
+  probe.onerror = showDenied;
+  probe.src = GATE_PROBE_URL + "?cb=" + Date.now();
+
+  setTimeout(function () {
+    if (gateEl.style.display !== "flex" && contentEl.style.visibility !== "visible") {
+      showDenied();
+    }
+  }, 8000);
+})();
+</script>
+
+<script>
+// ============================================================
+// CATALOG APP LOGIC
+// ============================================================
+var IMG_BASE = "https://dvagov.sharepoint.com/sites/V4hr/HRIS/SiteAssets/app-catalog/";
+
+var apps = [
   {
     id: "aims",
     name: "AIMS",
     fullName: "Action Item Management System",
     developer: "Chris Duenas",
-    description: "The Action Item Management System (AIMS) is a modern, centralized platform designed to streamline how organizations enter, track, and manage action items. By providing a consistent structure for creating tasks, assigning responsibilities, setting deadlines, and monitoring progress in real time, AIMS enhances clarity, coordination, and accountability across teams.\n\nAIMS empowers staff to:\n• Create and assign action items with clear owners, timelines, and expectations.\n• Monitor progress in real time using an intuitive dashboard and role-based views for Owners, Admins, and Members.\n• Leverage robust reporting to visualize activity, measure progress, and ensure follow-through on key initiatives.\n• Route actions appropriately across VISN, station, or service line levels, ensuring proper review and collaboration.\n• Receive automated notifications when actions are assigned, returned, or completed—keeping everyone aligned.",
+    description: "The Action Item Management System (AIMS) is a modern, centralized platform designed to streamline how organizations enter, track, and manage action items. By providing a consistent structure for creating tasks, assigning responsibilities, setting deadlines, and monitoring progress in real time, AIMS enhances clarity, coordination, and accountability across teams.\n\nAIMS empowers staff to:\n- Create and assign action items with clear owners, timelines, and expectations.\n- Monitor progress in real time using an intuitive dashboard and role-based views for Owners, Admins, and Members.\n- Leverage robust reporting to visualize activity, measure progress, and ensure follow-through on key initiatives.\n- Route actions appropriately across VISN, station, or service line levels, ensuring proper review and collaboration.\n- Receive automated notifications when actions are assigned, returned, or completed, keeping everyone aligned.",
     tags: ["Task Management", "Reporting"],
     files: ["aims1.png", "aims2.png", "aims3.png", "aims4.png", "aims5.png"]
   },
@@ -815,7 +907,7 @@ const apps = [
     name: "RMC",
     fullName: "Resource Management Center",
     developer: "Chris Duenas",
-    description: "The RMC App provides a modern, centralized platform for VISN 4 leaders, service lines, and HR staff to submit and track workforce management requests with clarity, transparency, and efficiency. Built on the Microsoft Cloud platform, the app replaces the legacy LEAF portal while maintaining all required internal procedures—now with a significantly improved user experience.\n\nSupports: New Position Requests, Vice Position Requests, Fee Basis Appointments, and FTEE Increase Requests.\n\nKey enhancements include Position Lookup Integration with HR Smart, Role-Based Access, Automated Routing through service chief, quad/pentad, finance, RMC/RMB, and medical center director, plus an Attachment Repository, Request History, Favorites, and Request Copying.",
+    description: "The RMC App provides a modern, centralized platform for VISN 4 leaders, service lines, and HR staff to submit and track workforce management requests with clarity, transparency, and efficiency. Built on the Microsoft Cloud platform, the app replaces the legacy LEAF portal while maintaining all required internal procedures, now with a significantly improved user experience.\n\nSupports: New Position Requests, Vice Position Requests, Fee Basis Appointments, and FTEE Increase Requests.\n\nKey enhancements include Position Lookup Integration with HR Smart, Role-Based Access, Automated Routing through service chief, quad/pentad, finance, RMC/RMB, and medical center director, plus an Attachment Repository, Request History, Favorites, and Request Copying.",
     tags: ["Workforce Management", "Routing"],
     files: ["rmc1.png", "rmc2.png", "rmc3.png", "rmc4.png"]
   },
@@ -824,7 +916,7 @@ const apps = [
     name: "Special Leave",
     fullName: "Special Leave Program Portal",
     developer: "Chris Duenas",
-    description: "The Special Leave App is your all-in-one gateway for navigating federal leave programs with clarity, consistency, and ease. Designed to support employees through life's planned and unexpected events, the app provides streamlined access to major leave flexibilities—including FMLA, Paid Parental Leave, Voluntary Leave Transfer Program (VLTP), Disabled Veteran Leave, Military Leave, and other specialized entitlements.\n\nKey program areas:\n• Family and Medical Leave Act (FMLA) — up to 12 workweeks, continuous or intermittent.\n• Paid Parental Leave (PPL) — up to 12 weeks following birth, adoption, or foster placement.\n• Voluntary Leave Transfer Program (VLTP) — donated leave for medical emergencies.\n• Disabled Veteran Leave (DVL) — up to 104 hours for eligible veterans.\n\nThrough intuitive workflows, role-based guidance, and submission pathways, the app centralizes policy information and supports timely, accurate leave requests.",
+    description: "The Special Leave App is your all-in-one gateway for navigating federal leave programs with clarity, consistency, and ease. Designed to support employees through life's planned and unexpected events, the app provides streamlined access to major leave flexibilities, including FMLA, Paid Parental Leave, Voluntary Leave Transfer Program (VLTP), Disabled Veteran Leave, Military Leave, and other specialized entitlements.\n\nKey program areas:\n- Family and Medical Leave Act (FMLA): up to 12 workweeks, continuous or intermittent.\n- Paid Parental Leave (PPL): up to 12 weeks following birth, adoption, or foster placement.\n- Voluntary Leave Transfer Program (VLTP): donated leave for medical emergencies.\n- Disabled Veteran Leave (DVL): up to 104 hours for eligible veterans.\n\nThrough intuitive workflows, role-based guidance, and submission pathways, the app centralizes policy information and supports timely, accurate leave requests.",
     tags: ["Leave Management", "FMLA"],
     files: ["leave1.png", "leave2.png", "leave3.png", "leave4.png"]
   },
@@ -833,7 +925,7 @@ const apps = [
     name: "DocuFlow",
     fullName: "Dynamic Document Routing",
     developer: "Chris Duenas",
-    description: "DocuFlow is a flexible, dynamic document-routing application designed to streamline approvals, enhance collaboration, and adapt to the way your organization works. Unlike traditional routing tools with rigid, predetermined sequences, DocuFlow empowers users to create custom workflows that fit any process—simple or complex.\n\nUsers can quickly generate a routing request by entering key details (title, description, due date, attachments) and selecting approval groups or individuals. Its dynamic routing engine allows steps to be added, removed, or rearranged at any time. Reviewers can comment, approve, request changes, or return items to the originator, and a complete history log maintains transparency throughout the document lifecycle.\n\nRole-based experiences—Member, Admin, and Owner—adapt to different responsibilities while keeping the interface streamlined and customizable.",
+    description: "DocuFlow is a flexible, dynamic document-routing application designed to streamline approvals, enhance collaboration, and adapt to the way your organization works. Unlike traditional routing tools with rigid, predetermined sequences, DocuFlow empowers users to create custom workflows that fit any process, simple or complex.\n\nUsers can quickly generate a routing request by entering key details (title, description, due date, attachments) and selecting approval groups or individuals. Its dynamic routing engine allows steps to be added, removed, or rearranged at any time. Reviewers can comment, approve, request changes, or return items to the originator, and a complete history log maintains transparency throughout the document lifecycle.\n\nRole-based experiences, Member, Admin, and Owner, adapt to different responsibilities while keeping the interface streamlined and customizable.",
     tags: ["Document Routing", "Approvals"],
     files: ["docuflow1.png", "docuflow2.png", "docuflow3.png", "docuflow4.png"]
   },
@@ -851,7 +943,7 @@ const apps = [
     name: "VISN 4 HR Hub",
     fullName: "VISN 4 Human Resources Hub",
     developer: "Chris Duenas",
-    description: "The VISN 4 HR Hub is a centralized, easy-to-navigate workspace that gives employees, supervisors, and HR professionals direct access to all HR resources across VISN 4. The Hub organizes essential tools, systems, and information into clear sections, helping users quickly find what they need while supporting efficient HR operations.\n\nKey Features:\n• Centralized HR Access — yourHR Help Desk, Employee Self-Service, communications, org charts, work-life benefits, PIV scheduling, and more.\n• Streamlined Navigation — quick access to VA forms, HR Smart references, staffing tools, and policy libraries.\n• Comprehensive HR Resource Library — recruitment, onboarding, classification references, and operations content.\n• Integrated VISN 4 Organizational Support — directories, calendars, and coordination updates.\n• HRIS and Modernization Support — highlights VISN 4 HRIS applications and transformation initiatives.",
+    description: "The VISN 4 HR Hub is a centralized, easy-to-navigate workspace that gives employees, supervisors, and HR professionals direct access to all HR resources across VISN 4. The Hub organizes essential tools, systems, and information into clear sections, helping users quickly find what they need while supporting efficient HR operations.\n\nKey Features:\n- Centralized HR Access: yourHR Help Desk, Employee Self-Service, communications, org charts, work-life benefits, PIV scheduling, and more.\n- Streamlined Navigation: quick access to VA forms, HR Smart references, staffing tools, and policy libraries.\n- Comprehensive HR Resource Library: recruitment, onboarding, classification references, and operations content.\n- Integrated VISN 4 Organizational Support: directories, calendars, and coordination updates.\n- HRIS and Modernization Support: highlights VISN 4 HRIS applications and transformation initiatives.",
     tags: ["Resource Hub", "Navigation"],
     files: ["v4hr1.png", "v4hr2.png", "v4hr3.png", "v4hr4.png", "v4hr5.png"]
   },
@@ -868,7 +960,7 @@ const apps = [
     id: "duty-station",
     name: "Duty Station Verification",
     fullName: "Duty Station Verification Portal",
-    developer: "Dana O'Sullivan",
+    developer: "Dana O\u2019Sullivan",
     description: "A centralized, user-friendly portal that guides employees and supervisors through the full Duty Station Verification process. The application standardizes data collection, automates routing and notifications, and maintains a clear audit trail for HR and leadership review. By consolidating required information into one place, the tool enhances compliance, reduces errors, and ensures annual duty station validations are completed accurately and on time.",
     tags: ["Verification"],
     files: ["dutystation.png"]
@@ -877,7 +969,7 @@ const apps = [
     id: "scheduling",
     name: "Scheduling",
     fullName: "New-Hire Testing Scheduler",
-    developer: "Dana O'Sullivan",
+    developer: "Dana O\u2019Sullivan",
     description: "An automated scheduling solution that manages new-hire onboarding requirements, including pre-employment physicals, drug tests, medical evaluations, and Employee Health appointments. The app ensures appointments are coordinated efficiently between HR, Occupational Health, and incoming employees. By reducing manual follow-up and eliminating scheduling inconsistencies, the tool supports a smoother onboarding experience and helps new employees meet all mandatory requirements quickly and accurately.",
     tags: ["Onboarding", "Automation"],
     files: ["scheduling1.png", "scheduling2.png"]
@@ -887,7 +979,7 @@ const apps = [
     name: "Payment Tracker",
     fullName: "HR Payment Tracking Dashboard",
     developer: "Thomas Lieb",
-    description: "A comprehensive dashboard that tracks, monitors, and organizes HR-related payments in real time. This application centralizes payment workflows—including incentives, reimbursements, and special pay actions—giving HR teams and leadership a clear view of payment status, processing timelines, and pending actions. With built-in alerts and transparent reporting, the Payment Tracker improves accountability, reduces delays, and ensures financial processes remain accurate and auditable.",
+    description: "A comprehensive dashboard that tracks, monitors, and organizes HR-related payments in real time. This application centralizes payment workflows, including incentives, reimbursements, and special pay actions, giving HR teams and leadership a clear view of payment status, processing timelines, and pending actions. With built-in alerts and transparent reporting, the Payment Tracker improves accountability, reduces delays, and ensures financial processes remain accurate and auditable.",
     tags: ["Finance", "Dashboard"],
     files: ["paymentTracker1.png"]
   },
@@ -899,53 +991,83 @@ const apps = [
     description: "A powerful analytics hub that connects users to a wide collection of HR dashboards and reports designed to support data-driven decision-making. The app allows users to search, filter, and organize dashboards across workforce management, recruitment, telework, compensation, and other HR domains. Features such as favoriting, detailed insights views, quick navigation, and integrated contact options make it easy to explore trends, monitor key metrics, and collaborate with dashboard owners. HR Insights provides a centralized, intuitive environment for turning HR data into meaningful action.",
     tags: ["Analytics", "Dashboard"],
     files: ["insights.png"]
+  },
+  {
+    id: "t38-tracker",
+    name: "T38 Probationary Tracker",
+    fullName: "Title 38 Probationary Tracker",
+    developer: "Shane Walker",
+    description: "The T38 Probationary Tracker App centralizes all probation review activities for Title 38 employees across VISN 4, giving HR teams and supervisors a streamlined, consistent way to complete required evaluations. The application brings together reviews, documentation, and decision workflows into one organized system, reducing administrative burden and ensuring timely completion of all probationary milestones.\n\nBy consolidating these processes, the app enhances transparency, improves accuracy of record-keeping, and supports more efficient communication between HR, supervisors, and leadership. This unified platform helps facilities maintain compliance while making probation management more intuitive and reliable.",
+    tags: ["Workforce Management", "Compliance"],
+    files: ["t38.png"]
+  },
+  {
+    id: "employee-move",
+    name: "Employee Move",
+    fullName: "Employee Move Request Portal",
+    developer: "Dana O\u2019Sullivan",
+    description: "The Employee Move App serves as a one-stop portal for initiating, routing, and tracking employee move requests. Designed to eliminate manual processes and reduce delays, the app automatically sends requests through the appropriate approval path, ensuring each move follows the correct workflow from start to finish.\n\nWith built-in automation and status visibility, employees and approvers alike benefit from a smoother experience. The result is a faster, more consistent, and more transparent process for managing duty station changes across VISN 4.",
+    tags: ["Routing", "Automation"],
+    files: ["move.png"]
+  },
+  {
+    id: "space-coordination",
+    name: "Space Coordination",
+    fullName: "Facility Space Coordination System",
+    developer: "Thomas Lieb",
+    description: "The Space Coordination App enables facility space coordinators to manage all workspace assignments in an organized and dynamic system. Coordinators can easily classify spaces as available, occupied, reserved, service-line designated, or eligible for RTO placement. HR's RTO team can then view real-time availability, select an appropriate space for an employee, and initiate the routing and approval steps.\n\nOnce HR selects a space, the request moves to the facility coordinator for review, then automatically notifies the supervisor to complete required actions. After final approval, employees receive a detailed confirmation with location name, address, floor, room number, and RTO date, creating a seamless, well-coordinated experience for all involved.",
+    tags: ["Facility Management", "Routing"],
+    files: ["space1.png", "space2.png", "space3.png", "space4.png", "space5.png"]
   }
 ];
 
-apps.sort((a, b) => a.name.localeCompare(b.name));
+apps.sort(function (a, b) { return a.name.localeCompare(b.name); });
 
-apps.forEach(app => {
+apps.forEach(function (app) {
   app.coverUrl = IMG_BASE + app.files[0];
-  app.shotUrls = app.files.map(f => IMG_BASE + f);
+  app.shotUrls = app.files.map(function (f) { return IMG_BASE + f; });
 });
 
 function onImgError(img) {
   img.onerror = null;
   img.src = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(
-    `<svg xmlns='http://www.w3.org/2000/svg' width='400' height='220'>
-      <rect width='100%' height='100%' fill='#17171b'/>
-      <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='#58585f' font-family='Arial' font-size='13'>Image not found</text>
-    </svg>`
+    "<svg xmlns='http://www.w3.org/2000/svg' width='400' height='220'>" +
+    "<rect width='100%' height='100%' fill='#17171b'/>" +
+    "<text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='#58585f' font-family='Arial' font-size='13'>Image not found</text>" +
+    "</svg>"
   );
 }
 
 function initials(name) {
-  return name.split(" ").map(w => w[0]).join("").slice(0,2).toUpperCase();
+  return name.split(" ").map(function (w) { return w[0]; }).join("").slice(0, 2).toUpperCase();
 }
 
 function renderHeroMetrics() {
-  const devCount = new Set(apps.map(a => a.developer)).size;
-  const metrics = [
+  var devCount = new Set(apps.map(function (a) { return a.developer; })).size;
+  var metrics = [
     { num: apps.length, lbl: "Applications" },
     { num: devCount, lbl: "Developers" },
     { num: "", lbl: "Microsoft Power Platform / O365", isText: true }
   ];
-  document.getElementById("heroMetrics").innerHTML = metrics.map(m =>
-    `<div class="hmetric"><div class="${m.isText ? 'num text-metric' : 'num'}">${m.isText ? m.lbl : m.num}</div>${m.isText ? '' : `<div class="lbl">${m.lbl}</div>`}</div>`
-  ).join("");
+  document.getElementById("heroMetrics").innerHTML = metrics.map(function (m) {
+    var numClass = m.isText ? "num text-metric" : "num";
+    var numContent = m.isText ? m.lbl : m.num;
+    var lblHtml = m.isText ? "" : ("<div class=\"lbl\">" + m.lbl + "</div>");
+    return "<div class=\"hmetric\"><div class=\"" + numClass + "\">" + numContent + "</div>" + lblHtml + "</div>";
+  }).join("");
 }
 
 function renderFilters() {
-  const allTags = new Set();
-  apps.forEach(a => a.tags.forEach(t => allTags.add(t)));
-  const chips = ["All", ...Array.from(allTags).sort()];
-  const wrap = document.getElementById("filterRow");
-  wrap.innerHTML = chips.map((c,i) =>
-    `<div class="filter-pill ${i===0?'active':''}" data-tag="${c}">${c}</div>`
-  ).join("");
-  wrap.querySelectorAll(".filter-pill").forEach(chip => {
-    chip.addEventListener("click", () => {
-      wrap.querySelectorAll(".filter-pill").forEach(c => c.classList.remove("active"));
+  var allTags = new Set();
+  apps.forEach(function (a) { a.tags.forEach(function (t) { allTags.add(t); }); });
+  var chips = ["All"].concat(Array.from(allTags).sort());
+  var wrap = document.getElementById("filterRow");
+  wrap.innerHTML = chips.map(function (c, i) {
+    return "<div class=\"filter-pill" + (i === 0 ? " active" : "") + "\" data-tag=\"" + c + "\">" + c + "</div>";
+  }).join("");
+  wrap.querySelectorAll(".filter-pill").forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      wrap.querySelectorAll(".filter-pill").forEach(function (c) { c.classList.remove("active"); });
       chip.classList.add("active");
       currentTag = chip.dataset.tag;
       render();
@@ -953,76 +1075,76 @@ function renderFilters() {
   });
 }
 
-let currentTag = "All";
+var currentTag = "All";
 
 function render() {
-  const query = document.getElementById("searchInput").value.toLowerCase().trim();
-  const grid = document.getElementById("appGrid");
-  const filtered = apps.filter(a => {
-    const matchesTag = currentTag === "All" || a.tags.includes(currentTag);
-    const haystack = (a.name + " " + a.fullName + " " + a.description + " " + a.developer).toLowerCase();
-    const matchesQuery = !query || haystack.includes(query);
+  var query = document.getElementById("searchInput").value.toLowerCase().trim();
+  var grid = document.getElementById("appGrid");
+  var filtered = apps.filter(function (a) {
+    var matchesTag = currentTag === "All" || a.tags.indexOf(currentTag) !== -1;
+    var haystack = (a.name + " " + a.fullName + " " + a.description + " " + a.developer).toLowerCase();
+    var matchesQuery = !query || haystack.indexOf(query) !== -1;
     return matchesTag && matchesQuery;
   });
 
-  document.getElementById("resultsCount").textContent =
-    `${filtered.length} of ${apps.length} applications`;
+  document.getElementById("resultsCount").textContent = filtered.length + " of " + apps.length + " applications";
 
   if (filtered.length === 0) {
-    grid.innerHTML = `<div class="no-results"><h3>No applications found</h3><p>Try a different search term or filter.</p></div>`;
+    grid.innerHTML = "<div class=\"no-results\"><h3>No applications found</h3><p>Try a different search term or filter.</p></div>";
     return;
   }
 
-  grid.innerHTML = filtered.map((app, i) => `
-    <div class="card" data-id="${app.id}" style="animation-delay:${i * 0.035}s">
-      <div class="card-image">
-        <img src="${app.coverUrl}" alt="${app.name} screenshot" loading="lazy" onerror="onImgError(this)">
-      </div>
-      <div class="card-body">
-        <div class="card-tags">
-          ${app.tags.map(t => `<span class="tag-pill">${t}</span>`).join("")}
-        </div>
-        <div class="card-title">${app.name}</div>
-        <div class="card-desc">${app.description.split("\n")[0]}</div>
-        <div class="card-footer">
-          <div class="dev-tag">
-            <div class="dev-avatar">${initials(app.developer)}</div>
-            <span>${app.developer}</span>
-          </div>
-          <div class="view-link">
-            View details
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-          </div>
-        </div>
-      </div>
-    </div>
-  `).join("");
+  grid.innerHTML = filtered.map(function (app, i) {
+    var tagsHtml = app.tags.map(function (t) { return "<span class=\"tag-pill\">" + t + "</span>"; }).join("");
+    var firstLine = app.description.split("\n")[0];
+    return (
+      "<div class=\"card\" data-id=\"" + app.id + "\" style=\"animation-delay:" + (i * 0.035) + "s\">" +
+        "<div class=\"card-image\">" +
+          "<img src=\"" + app.coverUrl + "\" alt=\"" + app.name + " screenshot\" loading=\"lazy\" onerror=\"onImgError(this)\">" +
+        "</div>" +
+        "<div class=\"card-body\">" +
+          "<div class=\"card-tags\">" + tagsHtml + "</div>" +
+          "<div class=\"card-title\">" + app.name + "</div>" +
+          "<div class=\"card-desc\">" + firstLine + "</div>" +
+          "<div class=\"card-footer\">" +
+            "<div class=\"dev-tag\">" +
+              "<div class=\"dev-avatar\">" + initials(app.developer) + "</div>" +
+              "<span>" + app.developer + "</span>" +
+            "</div>" +
+            "<div class=\"view-link\">View details" +
+              "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"></line><polyline points=\"12 5 19 12 12 19\"></polyline></svg>" +
+            "</div>" +
+          "</div>" +
+        "</div>" +
+      "</div>"
+    );
+  }).join("");
 
-  grid.querySelectorAll(".card").forEach(card => {
-    card.addEventListener("click", () => openModal(card.dataset.id));
+  grid.querySelectorAll(".card").forEach(function (card) {
+    card.addEventListener("click", function () { openModal(card.dataset.id); });
   });
 }
 
+var currentShots = [];
+var currentShotIndex = 0;
+
 function openModal(id) {
-  const app = apps.find(a => a.id === id);
+  var app = apps.filter(function (a) { return a.id === id; })[0];
   currentShots = app.shotUrls;
-  document.getElementById("modalTags").innerHTML = app.tags.map(t => `<span class="tag-pill">${t}</span>`).join("");
-  document.getElementById("modalTitle").textContent = `${app.name} — ${app.fullName}`;
-  document.getElementById("modalDev").innerHTML = `<div class="dev-avatar" style="width:20px;height:20px;font-size:8.5px;">${initials(app.developer)}</div> Developed by ${app.developer}`;
+  document.getElementById("modalTags").innerHTML = app.tags.map(function (t) { return "<span class=\"tag-pill\">" + t + "</span>"; }).join("");
+  document.getElementById("modalTitle").textContent = app.name + " \u2014 " + app.fullName;
+  document.getElementById("modalDev").innerHTML = "<div class=\"dev-avatar\" style=\"width:20px;height:20px;font-size:8.5px;\">" + initials(app.developer) + "</div> Developed by " + app.developer;
   document.getElementById("modalDesc").textContent = app.description;
-  document.getElementById("modalShots").innerHTML = app.shotUrls.map((url, i) =>
-    `<div class="shot-item" data-index="${i}"><img src="${url}" alt="${app.name} screenshot" onerror="onImgError(this)"></div>`
-  ).join("");
+  document.getElementById("modalShots").innerHTML = app.shotUrls.map(function (url, i) {
+    return "<div class=\"shot-item\" data-index=\"" + i + "\"><img src=\"" + url + "\" alt=\"" + app.name + " screenshot\" onerror=\"onImgError(this)\"></div>";
+  }).join("");
   document.getElementById("modalOverlay").classList.add("show");
-  document.querySelectorAll(".shot-item").forEach(item => {
-    item.addEventListener("click", () => {
-      openLightbox(parseInt(item.dataset.index));
+  document.querySelectorAll(".shot-item").forEach(function (item) {
+    item.addEventListener("click", function () {
+      openLightbox(parseInt(item.dataset.index, 10));
     });
   });
 }
-
-let currentShots = [];
-let currentShotIndex = 0;
 
 function openLightbox(index) {
   currentShotIndex = index;
@@ -1032,8 +1154,8 @@ function openLightbox(index) {
 
 function updateLightbox() {
   document.getElementById("lightboxImg").src = currentShots[currentShotIndex];
-  document.getElementById("lightboxCounter").textContent = `${currentShotIndex + 1} / ${currentShots.length}`;
-  const multi = currentShots.length > 1;
+  document.getElementById("lightboxCounter").textContent = (currentShotIndex + 1) + " / " + currentShots.length;
+  var multi = currentShots.length > 1;
   document.getElementById("lightboxPrev").style.display = multi ? "flex" : "none";
   document.getElementById("lightboxNext").style.display = multi ? "flex" : "none";
   document.getElementById("lightboxCounter").style.display = multi ? "block" : "none";
@@ -1049,29 +1171,29 @@ function lightboxNext() {
   updateLightbox();
 }
 
-document.getElementById("lightboxPrev").addEventListener("click", (e) => {
+document.getElementById("lightboxPrev").addEventListener("click", function (e) {
   e.stopPropagation();
   lightboxPrev();
 });
-document.getElementById("lightboxNext").addEventListener("click", (e) => {
+document.getElementById("lightboxNext").addEventListener("click", function (e) {
   e.stopPropagation();
   lightboxNext();
 });
 
-document.getElementById("closeModal").addEventListener("click", () => {
+document.getElementById("closeModal").addEventListener("click", function () {
   document.getElementById("modalOverlay").classList.remove("show");
 });
-document.getElementById("modalOverlay").addEventListener("click", (e) => {
+document.getElementById("modalOverlay").addEventListener("click", function (e) {
   if (e.target.id === "modalOverlay") e.target.classList.remove("show");
 });
-document.getElementById("lightboxClose").addEventListener("click", () => {
+document.getElementById("lightboxClose").addEventListener("click", function () {
   document.getElementById("lightbox").classList.remove("show");
 });
-document.getElementById("lightbox").addEventListener("click", (e) => {
+document.getElementById("lightbox").addEventListener("click", function (e) {
   if (e.target.id === "lightbox") e.target.classList.remove("show");
 });
-document.addEventListener("keydown", (e) => {
-  const lightboxOpen = document.getElementById("lightbox").classList.contains("show");
+document.addEventListener("keydown", function (e) {
+  var lightboxOpen = document.getElementById("lightbox").classList.contains("show");
   if (e.key === "Escape") {
     document.getElementById("lightbox").classList.remove("show");
     document.getElementById("modalOverlay").classList.remove("show");
