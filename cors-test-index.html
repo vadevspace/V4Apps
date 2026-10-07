@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SharePoint CORS Test</title>
+<style>
+  body {
+    font-family: -apple-system, Arial, sans-serif;
+    background: #0d151f;
+    color: #f2f2f3;
+    padding: 40px;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+  h1 { font-size: 20px; margin-bottom: 20px; }
+  #status {
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .pending { background: #2a2f1a; color: #e8d87a; border: 1px solid #4a4a2a; }
+  .success { background: #16271c; color: #7ee89a; border: 1px solid #2a4a35; }
+  .fail { background: #2a1818; color: #ff8a8a; border: 1px solid #4a2a2a; }
+  pre {
+    background: #121b27;
+    border: 1px solid #22303f;
+    border-radius: 8px;
+    padding: 16px;
+    font-size: 12.5px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .url-box {
+    background: #121b27;
+    border: 1px solid #22303f;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 12.5px;
+    font-family: monospace;
+    margin-bottom: 20px;
+    word-break: break-all;
+  }
+  button {
+    background: #005ea2;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 20px;
+  }
+  button:hover { background: #4f9fd8; }
+</style>
+</head>
+<body>
+
+<h1>SharePoint CORS Fetch Test</h1>
+
+<p>This page attempts to fetch a JSON file hosted on SharePoint from this GitHub Pages origin. The result below tells us whether SharePoint will allow client-side <code>fetch()</code> calls from this domain.</p>
+
+<div class="url-box" id="targetUrl"></div>
+
+<button id="retryBtn">Run Test Again</button>
+
+<div id="status" class="pending">⏳ Running test...</div>
+
+<h3 style="font-size:14px; margin-top:24px;">Raw result:</h3>
+<pre id="output">(waiting...)</pre>
+
+<h3 style="font-size:14px; margin-top:24px;">What this tells you:</h3>
+<ul style="font-size:13.5px; color:#93a1b0;">
+  <li><strong>Success + data shown</strong> → CORS is allowed, you're logged into VA/SharePoint in this browser, and we can build the real catalog this way.</li>
+  <li><strong>Fail: "Failed to fetch" / TypeError</strong> → Almost always a CORS block. SharePoint's server is likely rejecting the cross-origin request outright. This needs a SharePoint/tenant admin to allow your GitHub Pages origin, or we switch to the MSAL auth approach.</li>
+  <li><strong>Fail: 401/403 status</strong> → CORS passed, but you're not authenticated in this browser session, or the file's permissions block you specifically. Try logging into Office.com in another tab first, then re-run the test.</li>
+  <li><strong>Fail: 404 status</strong> → CORS passed, but the file path/name doesn't match what's actually uploaded. Double-check the filename and path.</li>
+</ul>
+
+<script>
+  // ⚠️ UPDATE THIS to match the exact file you upload to SharePoint
+  const TEST_URL = "https://dvagov.sharepoint.com/sites/V4hr/HRIS/SiteAssets/app-catalog/test-data.json";
+
+  document.getElementById("targetUrl").textContent = "Target: " + TEST_URL;
+
+  async function runTest() {
+    const statusEl = document.getElementById("status");
+    const outputEl = document.getElementById("output");
+    statusEl.className = "pending";
+    statusEl.textContent = "⏳ Running test...";
+    outputEl.textContent = "(waiting...)";
+
+    try {
+      const res = await fetch(TEST_URL, { method: "GET" });
+
+      if (!res.ok) {
+        statusEl.className = "fail";
+        statusEl.textContent = `❌ Request reached the server but failed — HTTP ${res.status} ${res.statusText}`;
+        outputEl.textContent = `Status: ${res.status} ${res.statusText}\n\nThis means CORS likely passed (the browser got a real response), but check auth/permissions or the file path.`;
+        return;
+      }
+
+      const data = await res.json();
+      statusEl.className = "success";
+      statusEl.textContent = "✅ Success — CORS allowed, data retrieved.";
+      outputEl.textContent = JSON.stringify(data, null, 2);
+
+    } catch (err) {
+      statusEl.className = "fail";
+      statusEl.textContent = "❌ Fetch failed — almost certainly a CORS block.";
+      outputEl.textContent =
+        "Error: " + err.message +
+        "\n\nOpen your browser's DevTools Console (F12) and look for a red CORS error message " +
+        "mentioning 'Access-Control-Allow-Origin' for the exact technical reason.";
+    }
+  }
+
+  document.getElementById("retryBtn").addEventListener("click", runTest);
+  runTest();
+</script>
+
+</body>
+</html>
