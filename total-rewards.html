@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Total Reward$ Calculator | VA 2026 Benefits</title>
+<meta name="description" content="Estimate the full value of your VA compensation and benefits package.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+  :root{
+    --navy:#112e51; --blue:#005ea2; --sky:#9fd3ff; --gold:#f2a900; --green:#2e8540; --purple:#8e44ad; --red:#b31b1b;
+    --ink:#1b2430; --muted:#5b6777; --line:#e1e7ef; --soft:#f4f7fb;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--soft);color:var(--ink);font-family:'Inter',Lato,'Helvetica Neue',Arial,sans-serif;font-size:15px;line-height:1.5;}
+  h1,h2,h3,h4,.ui.button,.ui.input input{font-family:inherit !important;}
+  a{color:var(--blue);}
+
+  /* Top bar */
+  .topbar{background:var(--navy);color:#fff;border-bottom:4px solid var(--red);}
+  .topbar .inner{max-width:1200px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+  .brand{display:flex;align-items:center;gap:14px;color:#fff;text-decoration:none;}
+  .brand .mark{font-weight:800;font-size:1.9em;letter-spacing:-.02em;padding-right:14px;border-right:2px solid rgba(255,255,255,.7);line-height:1;}
+  .brand .org{line-height:1.25;font-size:.85em;}
+  .brand .org b{display:block;font-size:1.05em;}
+  .brand .org i{font-style:italic;font-weight:600;color:#cfe3f7;}
+  .topbar .year{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:5px 14px;font-weight:700;font-size:.85em;letter-spacing:.04em;white-space:nowrap;}
+
+  /* Hero */
+  .hero{background:linear-gradient(135deg,var(--navy) 0%,var(--blue) 62%,#0b8fb3 100%);color:#fff;position:relative;overflow:hidden;}
+  .hero:after{content:"";position:absolute;right:-120px;top:-120px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.14),transparent 70%);}
+  .hero .inner{max-width:1200px;margin:0 auto;padding:46px 24px 90px;position:relative;z-index:1;}
+  .hero h1{color:#fff;font-size:2.9em;font-weight:800;line-height:1.08;margin:0 0 12px;letter-spacing:-.02em;}
+  .hero h1 span{color:var(--sky);}
+  .hero p{font-size:1.15em;color:#e3eefa;max-width:40em;margin:0;}
+
+  main{max-width:1200px;margin:-60px auto 0;padding:0 24px 40px;position:relative;z-index:2;}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 6px 20px rgba(17,46,81,.08);}
+  .step{display:flex;align-items:center;gap:10px;margin:0 0 16px;color:var(--navy);font-size:1.3em;font-weight:800;}
+  .step .n{width:30px;height:30px;border-radius:50%;background:var(--blue);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:.72em;}
+
+  /* Categories */
+  .cats-card{padding:26px;}
+  .cats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;}
+  .cat{all:unset;box-sizing:border-box;cursor:pointer;background:#fff;border:2px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:8px;transition:border-color .15s,box-shadow .15s,background .15s;}
+  .cat:hover{border-color:var(--blue);box-shadow:0 8px 20px rgba(17,46,81,.12);}
+  .cat:focus-visible{outline:3px solid var(--gold);outline-offset:2px;}
+  .cat[aria-pressed="true"]{border-color:var(--blue);background:#f0f7fd;box-shadow:0 0 0 3px rgba(0,94,162,.2);}
+  .cat i.icon{font-size:1.7em;margin:0;}
+  .cat b{color:var(--navy);line-height:1.3;}
+
+  /* Calculator */
+  .calc{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:22px;margin-top:22px;align-items:start;}
+  .hidden{display:none !important;}
+  .panel{padding:22px 24px;}
+  .entry{background:#f0f6fc;border:1px solid #d5e3f2;border-radius:12px;padding:18px 20px;margin-bottom:18px;}
+  .entry-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;}
+  .eyebrow{font-size:.72em;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
+  .catname{font-weight:800;color:var(--navy);font-size:1.05em;}
+  .seg{background:#e1eaf5;border-radius:8px;padding:3px;display:inline-flex;}
+  .seg button{border:none;background:transparent;padding:7px 14px;border-radius:6px;font-weight:700;color:#4a5568;cursor:pointer;font-family:inherit;}
+  .seg button[aria-pressed="true"]{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(0,0,0,.15);}
+  .entry label{display:block;font-weight:700;color:var(--navy);margin-bottom:6px;}
+  .ui.massive.input input{font-weight:700;color:var(--navy);}
+  .note{margin-top:8px;color:#4a5568;font-size:.92em;}
+  .sect{padding:10px 0 4px;font-weight:800;color:var(--blue);}
+  .row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eef1f6;}
+  .row:last-child{border-bottom:none;}
+  .amt{font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums;white-space:nowrap;margin-left:16px;}
+  .tag{display:inline-block;font-size:.72em;font-weight:700;background:#fff4d6;color:#8a5a00;border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:middle;}
+
+  .side{position:sticky;top:18px;display:flex;flex-direction:column;gap:14px;}
+  .total{background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border-radius:16px;padding:26px 24px;text-align:center;box-shadow:0 12px 28px rgba(17,46,81,.28);}
+  .total .eyebrow{color:#bcd9f5;}
+  .total .big{font-size:3.1em;font-weight:800;line-height:1.1;margin:6px 0;letter-spacing:-.02em;font-variant-numeric:tabular-nums;}
+  .total .sub{color:#e3eefa;}
+  .bar{margin-top:16px;height:12px;border-radius:6px;background:rgba(255,255,255,.18);overflow:hidden;display:flex;}
+  .bar div{width:0;transition:width .35s ease;}
+  .legend{display:flex;justify-content:center;gap:16px;margin-top:8px;font-size:.85em;color:#e3eefa;}
+  .legend s{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;text-decoration:none;}
+  .mini{display:flex;align-items:center;gap:14px;padding:14px 16px;border-left-width:5px;}
+  .mini i.icon{font-size:1.8em;margin:0;}
+  .mini .t{font-weight:800;color:var(--navy);}
+  .mini .d{color:var(--muted);font-size:.88em;}
+  .mini .v{font-weight:800;font-size:1.15em;font-variant-numeric:tabular-nums;}
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .actions .ui.button{margin:0;}
+  .actions .wide{grid-column:1 / span 2;}
+
+  /* Info */
+  .info{margin-top:34px;}
+  .info h2{color:var(--navy);font-size:1.35em;font-weight:800;margin:0 0 14px;}
+  .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;}
+  .info-item{padding:16px 18px;}
+  .info-item b{display:block;color:var(--blue);margin-bottom:4px;}
+  .info-item span{color:#4a5568;}
+  .disclaimer{margin-top:22px;padding:16px 20px;color:var(--muted);font-size:.86em;line-height:1.6;background:#fff;border:1px solid var(--line);border-radius:12px;}
+
+  footer{background:var(--navy);color:#cfe3f7;border-top:4px solid var(--red);margin-top:30px;}
+  footer .inner{max-width:1200px;margin:0 auto;padding:16px 24px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;font-size:.9em;}
+
+  @media (max-width:860px){
+    .calc{grid-template-columns:1fr;}
+    .side{position:static;}
+    .hero h1{font-size:2.2em;}
+    .topbar .brand .org{display:none;}
+  }
+  @media print{
+    body{background:#fff;}
+    .hero,.cats-card,.noprint,.info,footer{display:none !important;}
+    main{margin:0;padding:0;}
+    .calc{grid-template-columns:1.4fr 1fr;margin-top:12px;}
+    .card,.total{box-shadow:none;}
+    .total{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .side{position:static;}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="inner">
+    <div class="brand">
+      <div class="mark">VA</div>
+      <div class="org"><b>U.S. Department of Veterans Affairs</b>Veterans Health Administration<br><i>Workforce Management &amp; Consulting</i></div>
+    </div>
+    <div class="year">Total Rewards &middot; 2026 Benefits</div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="inner">
+    <h1>Compensation + Benefits =<br><span>Your Total Reward$*</span></h1>
+    <p>Earn a competitive total reward$ package as you pursue excellence in serving Veterans. Choose your job category and enter your pay to see the potential monetized value of a full VA compensation package.</p>
+  </div>
+</section>
+
+<main id="tr-app">
+
+  <section class="card cats-card noprint" aria-labelledby="step1">
+    <h2 class="step" id="step1"><span class="n">1</span>Choose your job category</h2>
+    <div class="cats" id="tr-cats">
+      <button type="button" class="cat" data-cat="doctor" aria-pressed="false"><i class="user md icon" style="color:var(--blue)"></i><b>Physician, Dentist, Podiatrist</b></button>
+      <button type="button" class="cat" data-cat="nurse" aria-pressed="false"><i class="heartbeat icon" style="color:var(--red)"></i><b>RN, NP, CRNA, Optometrist, Chiropractor, Physician Assistant, and EFDA</b></button>
+      <button type="button" class="cat" data-cat="vba" aria-pressed="false"><i class="file alternate outline icon" style="color:var(--green)"></i><b>Veterans Benefits Administration</b></button>
+      <button type="button" class="cat" data-cat="nca" aria-pressed="false"><i class="flag outline icon" style="color:var(--purple)"></i><b>National Cemetery Administration</b></button>
+      <button type="button" class="cat" data-cat="other" aria-pressed="false"><i class="users icon" style="color:var(--gold)"></i><b>All other positions</b></button>
+    </div>
+  </section>
+
+  <section id="tr-calc" class="calc hidden" aria-labelledby="step2">
+    <div class="card panel">
+      <h2 class="step noprint" id="step2"><span class="n">2</span>Enter your pay</h2>
+      <div class="entry">
+        <div class="entry-top">
+          <div><div class="eyebrow">Job category</div><div class="catname" id="tr-catname"></div></div>
+          <div class="seg noprint hidden" id="tr-mode" role="group" aria-label="Pay type">
+            <button type="button" data-mode="annual" aria-pressed="true">Annual salary</button><button type="button" data-mode="hourly" aria-pressed="false">WG hourly rate</button>
+          </div>
+        </div>
+        <label id="tr-label" for="tr-input">Annual salary</label>
+        <div class="ui massive fluid left icon input">
+          <input id="tr-input" type="text" inputmode="decimal" placeholder="Salary amount here" autocomplete="off">
+          <i class="dollar sign icon"></i>
+        </div>
+        <div class="note hidden" id="tr-hourlynote">Annual salary = hourly rate &times; 2,087 hours = <strong id="tr-annualfromhourly">$0</strong></div>
+      </div>
+
+      <div class="eyebrow" style="margin-bottom:4px;">Sample Annual Total Reward$ Worksheet &middot; Full-time Employee*</div>
+      <div class="sect">Direct Compensation</div>
+      <div class="row"><span>Salary</span><span class="amt" data-out="salary">&mdash;</span></div>
+      <div class="sect" style="margin-top:10px;">Total Rewards of Benefits Provided by VA</div>
+      <div class="row"><span>Health Insurance Premium Subsidy</span><span class="amt" data-out="health">&mdash;</span></div>
+      <div class="row"><span>Social Security</span><span class="amt" data-out="ss">&mdash;</span></div>
+      <div class="row"><span>Medicare</span><span class="amt" data-out="medicare">&mdash;</span></div>
+      <div class="row"><span>Basic Life Insurance</span><span class="amt" data-out="life">&mdash;</span></div>
+      <div class="row"><span>Thrift Savings Plan Federal 401(k) (Employer Contributions)</span><span class="amt" data-out="tsp">&mdash;</span></div>
+      <div class="row"><span>Federal Employee Retirement System (FERS)</span><span class="amt" data-out="fers">&mdash;</span></div>
+      <div class="row" data-row="childcare"><span>Child Care Subsidy <span class="tag">Max subsidy &middot; conditions apply</span></span><span class="amt" data-out="childcare">&mdash;</span></div>
+      <div class="row hidden" data-row="perf"><span>Potential physician performance pay <span class="tag">Conditions apply</span></span><span class="amt" data-out="perf">&mdash;</span></div>
+      <div class="row hidden" data-row="cme"><span>CME Reimbursement <span class="tag">Conditions apply</span></span><span class="amt" data-out="cme">&mdash;</span></div>
+    </div>
+
+    <aside class="side">
+      <div class="total" aria-live="polite">
+        <div class="eyebrow">Annual Total Reward$*</div>
+        <div class="big" id="tr-total">&mdash;</div>
+        <div class="sub" id="tr-benefits">Enter a salary amount to see your estimate</div>
+        <div class="bar"><div id="tr-barsal" style="background:var(--sky)"></div><div id="tr-barben" style="background:var(--gold)"></div></div>
+        <div class="legend"><span><s style="background:var(--sky)"></s>Salary</span><span><s style="background:var(--gold)"></s>Benefits</span></div>
+      </div>
+      <div class="card mini" style="border-left-color:var(--green)">
+        <i class="calendar check outline icon" style="color:var(--green)"></i>
+        <div><div class="t">Value of Paid Time Off</div><div class="d" id="tr-ptolabel">Paid holidays, sick leave and annual leave</div><div class="v" id="tr-pto" style="color:var(--green)">&mdash;</div></div>
+      </div>
+      <div class="card mini" style="border-left-color:var(--purple)">
+        <i class="child icon" style="color:var(--purple)"></i>
+        <div><div class="t">Value of Parental Paid Leave</div><div class="d">12 weeks, if taken</div><div class="v" id="tr-ppl" style="color:var(--purple)">&mdash;</div></div>
+      </div>
+      <div class="actions noprint">
+        <button type="button" id="tr-print" class="ui blue button"><i class="print icon"></i>Print / Save PDF</button>
+        <a id="tr-email" class="ui basic blue button" href="#"><i class="envelope outline icon"></i>Email this</a>
+        <button type="button" id="tr-reset" class="ui basic button wide"><i class="redo icon"></i>Start over</button>
+      </div>
+    </aside>
+  </section>
+
+  <section class="info">
+    <h2><i class="info circle icon" style="color:var(--blue)"></i>More about your potential benefits</h2>
+    <div class="info-grid">
+      <div class="card info-item"><b>Social Security paid by VA</b><span>6.2% of taxable wages on behalf of the employee. If taxable wages exceed the taxable maximum of $176,100, VA contributes $10,918.</span></div>
+      <div class="card info-item"><b>Medicare paid by VA</b><span>1.45% on behalf of the employee.</span></div>
+      <div class="card info-item"><b>Life Insurance</b><span>VA pays 1/3 of the cost of basic life insurance.</span></div>
+      <div class="card info-item"><b>Thrift Savings Plan (TSP) Federal 401(k)</b><span>VA provides up to 5% employer contributions (1% automatic contribution and up to 4% employer matching contributions).</span></div>
+      <div class="card info-item"><b>Federal Employee Retirement System (FERS)</b><span>For employees hired after 1/1/2014, VA contributes 16.5% annually to the FERS-FRAE basic/defined benefit traditional pension.</span></div>
+      <div class="card info-item"><b>VHA National Child Care Program</b><span>After 60 days of employment, full-time employees with a total family income below $149,000 may be eligible for the childcare subsidy program (conditions apply).</span></div>
+      <div class="card info-item"><b>Flexible Spending Account (FSA)</b><span>Contribute up to $3,200 a year to a health care FSA with a $640 maximum carry-over, and save up to 30% on dependent care expenses.</span></div>
+      <div class="card info-item"><b>Employee Assistance Program (EAP)</b><span>Free legal and medical services and up to 8 hours of authorized absence per year.</span></div>
+      <div class="card info-item"><b>Transit Benefit Program</b><span>You may qualify for a transit subsidy of up to $265/month; check with your local VA facility (conditions apply).</span></div>
+      <div class="card info-item"><b>Student Loan Repayment Program (SLRP)</b><span>For hard-to-recruit and retain positions, you may receive up to $40,000 per year and up to $100,000 total toward student loans in return for a 3-year service agreement.</span></div>
+      <div class="card info-item"><b>Competitive Salaries &amp; Regular Increases</b><span>Pay is based on grade, step and duty location. Receive annual increases when signed into law, plus within-grade &ldquo;step&rdquo; increases every year for 3 years and then every 2&ndash;3 years.</span></div>
+      <div class="card info-item"><b>Employment Without Strings</b><span>Full- or part-time, VA employment comes without employment contracts, noncompete clauses, restrictive covenants or other significant restrictions on outside work.</span></div>
+    </div>
+    <p style="margin-top:16px;color:#4a5568;">For the Total Reward$ Brochures and Occupation Flyers, visit <a href="https://www.vacareers.va.gov/OurPatients/VideosBrochures/#TotalReward$" target="_blank" rel="noopener">VA Careers</a>.</p>
+  </section>
+
+  <div class="disclaimer">
+    *This calculation is a sample only and does not constitute a contract of employment or a guarantee of benefits or future employment. Certain elements vary and are based on specific circumstances. Paid leave is not an additional payment but is the value of your paid time off included in your annual salary based on an 8-hour day. If your service includes part-time calculations, your total rewards and benefits will be proportionally prorated. For more information, please see <a href="https://www.opm.gov/" target="_blank" rel="noopener">www.opm.gov</a>.
+  </div>
+</main>
+
+<footer>
+  <div class="inner">
+    <span>Powered by HCM (Human Capital Management)</span>
+    <span>VHA Workforce Management &amp; Consulting &middot; 2026 Benefits</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var CATS={
+    doctor:{name:'Physician, Dentist, Podiatrist',pto:[50],physician:true},
+    nurse:{name:'RN, NP, CRNA, Optometrist, Chiropractor, Physician Assistant, and EFDA',pto:[50]},
+    vba:{name:'Veterans Benefits Administration',pto:[37,50]},
+    nca:{name:'National Cemetery Administration',pto:[37,50]},
+    other:{name:'All other positions',pto:[37,50],hourly:true}
+  };
+  var HOURS=2087, HEALTH=13160, CHILDCARE=5000, CHILDCARE_LIMIT=149000,
+      SS_RATE=0.062, SS_WAGE_MAX=176100, SS_MAX=10918, MEDICARE=0.0145, LIFE=0.00264, TSP=0.05, FERS=0.165,
+      PERF_RATE=0.075, PERF_LIMIT=200000, PERF_MAX=15000, CME=1000;
+  var app=document.getElementById('tr-app'), cat=null, mode='annual';
+  var $=function(id){return document.getElementById(id);};
+  var q=function(sel){return app.querySelectorAll(sel);};
+  var money=function(n){return '$'+Math.round(n).toLocaleString('en-US');};
+  var num=function(s){var n=parseFloat(String(s).replace(/[^0-9.]/g,''));return isNaN(n)?null:n;};
+  var out=function(k,v){var e=app.querySelector('[data-out="'+k+'"]');if(e)e.textContent=v;};
+  var show=function(el,on){if(el)el.classList[on?'remove':'add']('hidden');};
+  var row=function(k){return app.querySelector('[data-row="'+k+'"]');};
+
+  function salary(){var v=num($('tr-input').value);if(v===null)return null;return mode==='hourly'?Math.round(v*HOURS):v;}
+
+  function calc(){
+    var c=CATS[cat]; if(!c) return;
+    var s=salary();
+    show($('tr-hourlynote'),mode==='hourly');
+    if(mode==='hourly') $('tr-annualfromhourly').textContent=s===null?'$0':money(s);
+    show(row('perf'),!!c.physician); show(row('cme'),!!c.physician);
+    if(s===null){
+      ['salary','health','ss','medicare','life','tsp','fers','childcare','perf','cme'].forEach(function(k){out(k,'\u2014');});
+      show(row('childcare'),true);
+      $('tr-total').textContent='\u2014'; $('tr-benefits').textContent='Enter a salary amount to see your estimate';
+      $('tr-pto').textContent='\u2014'; $('tr-ppl').textContent='\u2014';
+      $('tr-barsal').style.width='0'; $('tr-barben').style.width='0';
+      return;
+    }
+    // Each line is rounded to whole dollars before totaling, matching the original app.
+    var r=Math.round;
+    var items={health:HEALTH, ss:s<SS_WAGE_MAX?r(s*SS_RATE):SS_MAX, medicare:r(s*MEDICARE), life:r(s*LIFE), tsp:r(s*TSP), fers:r(s*FERS)};
+    var cc=s<CHILDCARE_LIMIT; if(cc) items.childcare=CHILDCARE;
+    if(c.physician){items.perf=s<PERF_LIMIT?r(s*PERF_RATE):PERF_MAX; items.cme=CME;}
+    var ben=0; for(var k in items){ben+=items[k]; out(k,money(items[k]));}
+    show(row('childcare'),cc);
+    out('salary',money(s));
+    var total=s+ben, day=s/HOURS*8;
+    $('tr-total').textContent=money(total);
+    $('tr-benefits').textContent='(Value of benefits alone: '+money(ben)+')';
+    $('tr-barsal').style.width=(s/total*100)+'%'; $('tr-barben').style.width=(ben/total*100)+'%';
+    $('tr-ptolabel').textContent='Paid holidays, sick leave and annual leave ('+c.pto.join(' \u2013 ')+' days)';
+    $('tr-pto').textContent=c.pto.map(function(d){return money(day*d);}).join(' \u2013 ');
+    $('tr-ppl').textContent=money(day*60);
+
+    var lines=['VA Total Reward$ Estimate (2026)','Job category: '+c.name,'','Salary: '+money(s),'Health Insurance Premium Subsidy: '+money(items.health),'Social Security: '+money(items.ss),'Medicare: '+money(items.medicare),'Basic Life Insurance: '+money(items.life),'TSP Employer Contributions: '+money(items.tsp),'FERS: '+money(items.fers)];
+    if(cc) lines.push('Child Care Subsidy (max, conditions apply): '+money(CHILDCARE));
+    if(c.physician){lines.push('Potential physician performance pay: '+money(items.perf));lines.push('CME Reimbursement: '+money(CME));}
+    lines.push('','Annual Total Reward$*: '+money(total),'Value of benefits alone: '+money(ben),'Value of paid time off: '+$('tr-pto').textContent,'Value of parental paid leave (12 weeks, if taken): '+money(day*60),'','*Sample only; not a contract of employment or a guarantee of benefits.');
+    $('tr-email').href='mailto:?subject='+encodeURIComponent('Your VA Total Reward$ Estimate')+'&body='+encodeURIComponent(lines.join('\n'));
+  }
+
+  function setMode(m){
+    mode=m;
+    q('#tr-mode button').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-mode')===m);});
+    $('tr-label').textContent=m==='hourly'?'WG hourly rate':'Annual salary';
+    $('tr-input').placeholder=m==='hourly'?'Hourly rate here':'Salary amount here';
+    $('tr-input').value=''; calc(); $('tr-input').focus({preventScroll:true});
+  }
+
+  function pick(k){
+    cat=k;
+    q('.cat').forEach(function(el){el.setAttribute('aria-pressed',el.getAttribute('data-cat')===k);});
+    $('tr-catname').textContent=CATS[k].name;
+    show($('tr-mode'),!!CATS[k].hourly);
+    show($('tr-calc'),true);
+    setMode('annual');
+    $('tr-calc').scrollIntoView({block:'start'});
+  }
+
+  q('.cat').forEach(function(el){el.addEventListener('click',function(){pick(el.getAttribute('data-cat'));});});
+  q('#tr-mode button').forEach(function(b){b.addEventListener('click',function(){setMode(b.getAttribute('data-mode'));});});
+  $('tr-input').addEventListener('input',calc);
+  $('tr-print').addEventListener('click',function(){window.print();});
+  $('tr-email').addEventListener('click',function(e){if(salary()===null){e.preventDefault();$('tr-input').focus();}});
+  $('tr-reset').addEventListener('click',function(){
+    $('tr-input').value=''; cat=null; show($('tr-calc'),false);
+    q('.cat').forEach(function(el){el.setAttribute('aria-pressed','false');});
+    window.scrollTo({top:0});
+  });
+})();
+</script>
+</body>
+</html>
