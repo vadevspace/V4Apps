@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SharePoint Graph test</title>
+<style>
+body{font:14px system-ui,sans-serif;max-width:720px;margin:24px auto;padding:0 12px}
+label{display:block;margin:8px 0 2px}
+input{width:100%;box-sizing:border-box;padding:6px}
+button{margin:10px 6px 0 0;padding:8px 12px;cursor:pointer}
+pre{background:#111;color:#ddd;padding:10px;height:320px;overflow:auto;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<h2>SharePoint Graph test</h2>
+<label>Client ID<input id="cid" value="07edbbf7-7ee0-442a-9441-4ff1da973885"></label>
+<label>Tenant ID<input id="tid" value="e95f1b23-abaf-45ee-821d-b7ab251ab3bf"></label>
+<label>Site URL<input id="site" value="https://dvagov.sharepoint.com/sites/V4hr/proto/aims-test"></label>
+<label>Test list name<input id="list" value="AimsTest"></label>
+<div>Redirect URI to register (SPA): <b id="ru"></b></div>
+<button id="b1">1. Sign in</button>
+<button id="b2">2. Read site</button>
+<button id="b3">3. Create list</button>
+<button id="b4">4. Add item</button>
+<button id="b5">5. Read items</button>
+<pre id="log"></pre>
+<script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
+<script>
+const $=id=>document.getElementById(id),G='https://graph.microsoft.com/v1.0',SC=['Sites.ReadWrite.All'];
+const redirect=location.origin+location.pathname;$('ru').textContent=redirect;
+let app,acct,siteId,listId;
+const log=m=>{$('log').textContent+=(typeof m==='string'?m:JSON.stringify(m,null,2))+'\n'};
+async function getApp(){if(app)return app;app=new msal.PublicClientApplication({auth:{clientId:$('cid').value.trim(),authority:'https://login.microsoftonline.com/'+$('tid').value.trim(),redirectUri:redirect},cache:{cacheLocation:'sessionStorage'}});await app.initialize();return app}
+async function token(){const a=await getApp();if(!acct)acct=a.getAllAccounts()[0];if(!acct){acct=(await a.loginPopup({scopes:SC})).account}
+  try{return(await a.acquireTokenSilent({scopes:SC,account:acct})).accessToken}catch(e){return(await a.acquireTokenPopup({scopes:SC,account:acct})).accessToken}}
+async function gf(path,opt={}){const r=await fetch(G+path,{...opt,headers:{Authorization:'Bearer '+await token(),'Content-Type':'application/json'}});
+  if(!r.ok)throw new Error(r.status+' '+(await r.text()).slice(0,400));return r.status===204?null:r.json()}
+async function site(){if(siteId)return siteId;const u=new URL($('site').value.trim());siteId=(await gf(`/sites/${u.hostname}:${u.pathname}`)).id;return siteId}
+async function list(){if(listId)return listId;const r=await gf(`/sites/${await site()}/lists?$filter=displayName eq '${$('list').value}'`);if(!r.value[0])throw new Error('List not found; run step 3');return listId=r.value[0].id}
+const run=(b,fn)=>$(b).onclick=async()=>{try{await fn()}catch(e){log('ERROR: '+e.message)}};
+run('b1',async()=>{await token();log('Signed in as '+acct.username)});
+run('b2',async()=>{const s=await gf(`/sites/${await site()}`);log({name:s.displayName,url:s.webUrl,id:s.id})});
+run('b3',async()=>{const body={displayName:$('list').value,columns:[{name:'Note',text:{}},{name:'Count',number:{}}],list:{template:'genericList'}};
+  const r=await gf(`/sites/${await site()}/lists`,{method:'POST',body:JSON.stringify(body)});listId=r.id;log('Created list '+r.displayName)});
+run('b4',async()=>{const r=await gf(`/sites/${await site()}/lists/${await list()}/items`,{method:'POST',body:JSON.stringify({fields:{Title:'Test '+new Date().toISOString(),Note:'Hello from Graph',Count:1}})});log('Added item '+r.id)});
+run('b5',async()=>{const r=await gf(`/sites/${await site()}/lists/${await list()}/items?$expand=fields`);log(r.value.map(i=>({id:i.id,title:i.fields.Title,note:i.fields.Note,count:i.fields.Count})))});
+</script>
+</body>
+</html>
